@@ -1,7 +1,12 @@
 #!/bin/bash
+if [ "$DEPLOYENTRYPOINT"=="" ]
 if [ "$INSTALL_URL"=="github.com/openshift/origin/cmd/dockerregistry" ]
 then
  exec /opt/app-root/gobinary $REGISTRY_CONFIGURATION_PATH
 else
  echo "Not supported yet"
 fi
+else
+  exec $DEPLOYENTRYPOINT
+fi
+
