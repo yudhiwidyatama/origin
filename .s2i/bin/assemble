@@ -1,0 +1,4 @@
+#!/bin/bash
+mkdir -p /opt/app-root/src/bin
+cp /tmp/src/bin/dlv /opt/app-root/src/bin/dlv
+/usr/libexec/s2i/assemble
