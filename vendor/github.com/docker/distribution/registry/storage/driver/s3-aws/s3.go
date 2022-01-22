@@ -451,7 +451,20 @@ func (d *driver) Writer(ctx context.Context, path string, append bool) (storaged
 	if ctxRefUploadID != nil {
 		strRefUploadID, isRefOk := ctxRefUploadID.(string)
 		if isRefOk {
-			return d.newWriter(key, strRefUploadID, nil), nil
+			resp, err := d.S3.ListParts(&s3.ListPartsInput{
+				Bucket:   aws.String(d.Bucket),
+				Key:      aws.String(key),
+				UploadId: &strRefUploadID,
+			})
+			if err != nil {
+				return nil, parseError(path, err)
+			}
+			var multiSize int64
+			for _, part := range resp.Parts {
+				multiSize += *part.Size
+			}
+			return d.newWriter(key, strRefUploadID, resp.Parts), nil
+			// return d.newWriter(key, strRefUploadID, nil), nil
 		}
 
 	}
