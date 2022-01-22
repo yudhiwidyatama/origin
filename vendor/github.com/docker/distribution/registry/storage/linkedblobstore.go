@@ -314,7 +314,7 @@ func (lbs *linkedBlobStore) newBlobUpload(ctx context.Context, uuid, path string
 	fw, err := lbs.driver.Writer(ctx, path, append)
 	if err != nil {
 		if append {
-			fw, err := lbs.driver.Writer(ctx, path, false)
+			fw, err = lbs.driver.Writer(ctx, path, false)
 		}
 		if err != nil {
 			return nil, err
