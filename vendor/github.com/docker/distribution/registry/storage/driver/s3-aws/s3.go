@@ -436,7 +436,6 @@ func (d *driver) Writer(ctx context.Context, path string, append bool) (storaged
 			UploadId: multi.UploadId,
 		})
 		if err != nil {
-			gi
 			return nil, parseError(path, err)
 		}
 		var multiSize int64
