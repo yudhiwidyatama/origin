@@ -371,6 +371,9 @@ func newFileWriter(file *os.File, size int64) *fileWriter {
 	}
 }
 
+func (fw *fileWriter) RefUploadID() string {
+	return ""
+}
 func (fw *fileWriter) Write(p []byte) (int, error) {
 	if fw.closed {
 		return 0, fmt.Errorf("already closed")

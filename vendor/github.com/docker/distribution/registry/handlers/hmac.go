@@ -17,6 +17,8 @@ type blobUploadState struct {
 	// UUID identifies the upload.
 	UUID string
 
+	RefUploadID string
+
 	// offset contains the current progress of the upload.
 	Offset int64
 

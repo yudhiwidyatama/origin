@@ -217,6 +217,8 @@ type BlobWriter interface {
 	// Blob service to later resume the write.
 	ID() string
 
+	RefUploadID() string
+
 	// StartedAt returns the time this blob write was started.
 	StartedAt() time.Time
 

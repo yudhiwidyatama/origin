@@ -103,6 +103,8 @@ type FileWriter interface {
 	// available for future calls to StorageDriver.GetContent and
 	// StorageDriver.Reader.
 	Commit() error
+
+	RefUploadID() string
 }
 
 // PathRegexp is the regular expression which each file path must match. A

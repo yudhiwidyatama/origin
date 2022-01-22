@@ -409,6 +409,10 @@ func (d *driver) newWriter(path string, size int64) storagedriver.FileWriter {
 	}
 }
 
+func (w *writer) RefUploadID() string {
+	return ""
+}
+
 func (w *writer) Write(p []byte) (int, error) {
 	if w.closed {
 		return 0, fmt.Errorf("already closed")

@@ -44,6 +44,10 @@ func (bw *blobWriter) ID() string {
 	return bw.id
 }
 
+func (bw *blobWriter) RefUploadID() string {
+	return bw.fileWriter.RefUploadID()
+}
+
 func (bw *blobWriter) StartedAt() time.Time {
 	return bw.startedAt
 }

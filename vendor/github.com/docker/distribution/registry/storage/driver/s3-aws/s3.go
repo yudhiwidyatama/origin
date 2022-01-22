@@ -401,6 +401,7 @@ func (d *driver) Reader(ctx context.Context, path string, offset int64) (io.Read
 // at the location designated by "path" after the call to Commit.
 func (d *driver) Writer(ctx context.Context, path string, append bool) (storagedriver.FileWriter, error) {
 	key := d.s3Path(path)
+
 	if !append {
 		// TODO (brianbland): cancel other uploads at this path
 		resp, err := d.S3.CreateMultipartUpload(&s3.CreateMultipartUploadInput{
@@ -435,6 +436,7 @@ func (d *driver) Writer(ctx context.Context, path string, append bool) (storaged
 			UploadId: multi.UploadId,
 		})
 		if err != nil {
+			gi
 			return nil, parseError(path, err)
 		}
 		var multiSize int64
@@ -442,6 +444,17 @@ func (d *driver) Writer(ctx context.Context, path string, append bool) (storaged
 			multiSize += *part.Size
 		}
 		return d.newWriter(key, *multi.UploadId, resp.Parts), nil
+	}
+
+	ctxRefUploadID := ctx.Value("RefUploadID")
+
+	// fall thru, check context variable
+	if ctxRefUploadID != nil {
+		strRefUploadID, isRefOk := ctxRefUploadID.(string)
+		if isRefOk {
+			return d.newWriter(key, strRefUploadID, nil), nil
+		}
+
 	}
 	return nil, storagedriver.PathNotFoundError{Path: path}
 }
@@ -731,6 +744,9 @@ func (a completedParts) Len() int           { return len(a) }
 func (a completedParts) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a completedParts) Less(i, j int) bool { return *a[i].PartNumber < *a[j].PartNumber }
 
+func (w *writer) RefUploadID() string {
+	return w.uploadID
+}
 func (w *writer) Write(p []byte) (int, error) {
 	if w.closed {
 		return 0, fmt.Errorf("already closed")

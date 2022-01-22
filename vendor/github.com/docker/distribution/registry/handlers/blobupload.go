@@ -10,9 +10,10 @@ import (
 	"github.com/docker/distribution/digest"
 	"github.com/docker/distribution/reference"
 	"github.com/docker/distribution/registry/api/errcode"
-	"github.com/docker/distribution/registry/api/v2"
+	v2 "github.com/docker/distribution/registry/api/v2"
 	"github.com/docker/distribution/registry/storage"
 	"github.com/gorilla/handlers"
+	"golang.org/x/net/context"
 )
 
 // blobUploadDispatcher constructs and returns the blob upload handler for the
@@ -60,7 +61,7 @@ func blobUploadDispatcher(ctx *Context, r *http.Request) http.Handler {
 		}
 
 		blobs := ctx.Repository.Blobs(buh)
-		upload, err := blobs.Resume(buh, buh.UUID)
+		upload, err := blobs.Resume(context.WithValue(buh, "RefUploadID", state.RefUploadID), buh.UUID)
 		if err != nil {
 			ctxu.GetLogger(ctx).Errorf("error resolving upload: %v", err)
 			if err == distribution.ErrBlobUploadUnknown {
@@ -291,6 +292,7 @@ func (buh *blobUploadHandler) blobUploadResponse(w http.ResponseWriter, r *http.
 	// TODO(stevvooe): Need a better way to manage the upload state automatically.
 	buh.State.Name = buh.Repository.Named().Name()
 	buh.State.UUID = buh.Upload.ID()
+	buh.State.RefUploadID = buh.Upload.RefUploadID()
 	buh.Upload.Close()
 	buh.State.Offset = buh.Upload.Size()
 	buh.State.StartedAt = buh.Upload.StartedAt()
@@ -317,6 +319,7 @@ func (buh *blobUploadHandler) blobUploadResponse(w http.ResponseWriter, r *http.
 	}
 
 	w.Header().Set("Docker-Upload-UUID", buh.UUID)
+	w.Header().Set("Ref-Upload-ID", buh.Upload.RefUploadID())
 	w.Header().Set("Location", uploadURL)
 
 	w.Header().Set("Content-Length", "0")
