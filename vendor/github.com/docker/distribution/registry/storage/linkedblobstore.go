@@ -313,18 +313,23 @@ func (lbs *linkedBlobStore) mount(ctx context.Context, sourceRepo reference.Name
 func (lbs *linkedBlobStore) newBlobUpload(ctx context.Context, uuid, path string, startedAt time.Time, append bool) (distribution.BlobWriter, error) {
 	fw, err := lbs.driver.Writer(ctx, path, append)
 	if err != nil {
-		return nil, err
+		if append {
+			fw, err := lbs.driver.Writer(ctx, path, false)
+		}
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	bw := &blobWriter{
-		ctx:        ctx,
-		blobStore:  lbs,
-		id:         uuid,
-		startedAt:  startedAt,
-		digester:   digest.Canonical.New(),
-		fileWriter: fw,
-		driver:     lbs.driver,
-		path:       path,
+		ctx:                    ctx,
+		blobStore:              lbs,
+		id:                     uuid,
+		startedAt:              startedAt,
+		digester:               digest.Canonical.New(),
+		fileWriter:             fw,
+		driver:                 lbs.driver,
+		path:                   path,
 		resumableDigestEnabled: lbs.resumableDigestEnabled,
 	}
 
