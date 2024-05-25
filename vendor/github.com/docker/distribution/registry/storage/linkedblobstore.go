@@ -313,9 +313,9 @@ func (lbs *linkedBlobStore) mount(ctx context.Context, sourceRepo reference.Name
 func (lbs *linkedBlobStore) newBlobUpload(ctx context.Context, uuid, path string, startedAt time.Time, append bool) (distribution.BlobWriter, error) {
 	fw, err := lbs.driver.Writer(ctx, path, append)
 	if err != nil {
-		if append {
-			fw, err = lbs.driver.Writer(ctx, path, false)
-		}
+		//if append {
+		//	fw, err = lbs.driver.Writer(ctx, path, false)
+		//}
 		if err != nil {
 			return nil, err
 		}
